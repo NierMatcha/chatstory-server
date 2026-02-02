@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>ChatStory</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      padding: 12px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+    }
+
+    #log {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .player {
+      color: #9cdcfe;
+    }
+
+    .gm {
+      color: #dcdcaa;
+    }
+
+    footer {
+      display: flex;
+      padding: 12px;
+      border-top: 1px solid #333;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      background: #222;
+      color: #eee;
+      border: 1px solid #444;
+    }
+
+    button {
+      margin-left: 8px;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>ChatStory</header>
+
+  <div id="log"></div>
+
+  <footer>
+    <input id="input" placeholder="行動や文章を入力してください…" />
+    <button onclick="send()">送信</button>
+  </footer>
+
+  <script>
+    const log = document.getElementById("log");
+    const input = document.getElementById("input");
+
+    function addMessage(text, className) {
+      const div = document.createElement("div");
+      div.className = "message " + className;
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage("Player: " + text, "player");
+      input.value = "";
+
+      // サーバーへ送信
+      const res = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await res.json();
+      addMessage(data.reply, "gm");
+    }
+  </script>
+
+
+</body>
+
+</html>
