@@ -24,6 +24,34 @@ app.post("/chat", async (req, res) => {
     const playerMessage = req.body.message;
 
     try {
-        const completion = await client.chat.
+        const completion = await client.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: "あなたはTRPGのゲームマスターです。"
+                },
+                {
+                    role: "user",
+                    content: playerMessage
+                }
+            ]
+        });
+
+        const gmReply = "GM: " + completion.choices[0].message.content;
+        res.json({ reply: gmReply });
+
+    } catch (error) {
+        console.error(error);
+        res.json({ reply: "GM: ……（エラーが発生した）" });
+    }
+});
+
+// ====== Render 用 ======
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+});
+
 
 
